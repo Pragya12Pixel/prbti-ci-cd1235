@@ -29,13 +29,25 @@ pipeline {
 
         stage('Docker Tag') {
             steps {
-                bat 'docker tag cicd-python-app:v%BUILD_NUMBER% %DOCKER_USERNAME%/cicdpractise:v%BUILD_NUMBER%'
+                withCredentials([usernamePassword(
+                    credentialsId: 'dockerhub-creds',
+                    usernameVariable: 'DOCKER_USERNAME',
+                    passwordVariable: 'DOCKER_PASSWORD'
+                )]) {
+                    bat 'docker tag cicd-python-app:v%BUILD_NUMBER% %DOCKER_USERNAME%/cicdpractise:v%BUILD_NUMBER%'
+                }
             }
         }
 
         stage('Docker Push') {
             steps {
-                bat 'docker push %DOCKER_USERNAME%/cicdpractise:v%BUILD_NUMBER%'
+                withCredentials([usernamePassword(
+                    credentialsId: 'dockerhub-creds',
+                    usernameVariable: 'DOCKER_USERNAME',
+                    passwordVariable: 'DOCKER_PASSWORD'
+                )]) {
+                    bat 'docker push %DOCKER_USERNAME%/cicdpractise:v%BUILD_NUMBER%'
+                }
             }
         }
     }
