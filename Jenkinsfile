@@ -2,6 +2,7 @@ pipeline {
     agent any
 
     stages {
+
         stage('Checkout') {
             steps {
                 checkout scm
@@ -10,7 +11,31 @@ pipeline {
 
         stage('Docker Build') {
             steps {
-                bat 'docker build -t cicd-python-app .'
+                bat 'docker build -t cicd-python-app:v%BUILD_NUMBER% .'
+            }
+        }
+
+        stage('Docker Login') {
+            steps {
+                withCredentials([usernamePassword(
+                    credentialsId: 'dockerhub-credentials',
+                    usernameVariable: 'DOCKER_USERNAME',
+                    passwordVariable: 'DOCKER_PASSWORD'
+                )]) {
+                    bat 'echo %DOCKER_PASSWORD%| docker login --username %DOCKER_USERNAME% --password-stdin'
+                }
+            }
+        }
+
+        stage('Docker Tag') {
+            steps {
+                bat 'docker tag cicd-python-app:v%BUILD_NUMBER% %DOCKER_USERNAME%/cicdpractise:v%BUILD_NUMBER%'
+            }
+        }
+
+        stage('Docker Push') {
+            steps {
+                bat 'docker push %DOCKER_USERNAME%/cicdpractise:v%BUILD_NUMBER%'
             }
         }
     }
