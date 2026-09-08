@@ -8,6 +8,18 @@ pipeline {
             }
         }
 
+        stage('Install Dependencies') {
+            steps {
+                bat 'pip install -r requirements.txt'
+            }
+        }
+
+        stage('Test') {
+            steps {
+                bat 'pytest'
+            }
+        }
+
         stage('Docker Build') {
             steps {
                 bat 'docker build -t cicd-python-app .'
