@@ -8,6 +8,15 @@ pipeline {
             }
         }
 
+        stage('Check Python') {
+            steps {
+                bat 'where python'
+                bat 'python --version'
+                bat 'where pip'
+                bat 'pip --version'
+            }
+        }
+
         stage('Install Dependencies') {
             steps {
                 bat 'pip install -r requirements.txt'
